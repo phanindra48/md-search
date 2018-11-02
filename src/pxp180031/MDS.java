@@ -39,12 +39,48 @@ public class MDS {
     // insert/update id - price
     // insert / update id - description (need old and new listIds)
     // iterate list -> remove and add!
-    return 0;
+  	int flag = 1;
+  	Money m = idPriceMap.put(id, price);
+  	HashSet<Long> newDesc = new HashSet<>();
+  	HashSet<Long> temp;
+  	for(long listId : list)
+  	{
+  		newDesc.add(listId);
+  		HashSet<Long> hSet = descIdMap.get(listId);
+  		if(hSet == null)  
+  		{
+  			temp = new HashSet<>();
+  			temp.add(id);
+  			descIdMap.put(listId, temp);
+  		}
+  		else
+  		{
+  			hSet.add(id);
+  		}
+  	}
+  	if(m != null)
+  	{
+  		HashSet<Long> oldDesc = idDescMap.get(id);
+  		if(!oldDesc.isEmpty())
+  			oldDesc.removeAll(newDesc);
+  		for(long k : oldDesc)
+  		{
+  			descIdMap.get(k).remove(id);
+  		}
+  		flag = 0;
+  	}
+  	idDescMap.put(id, newDesc);
+  	return flag;
   }
 
   // b. Find(id): return price of item with given id (or 0, if not found).
   public Money find(long id) {
     // get from id - price
+  	Money m = idPriceMap.get(id);
+  	if(m != null)
+  	{
+  		return m;
+  	}
     return new Money();
   }
 
@@ -61,7 +97,16 @@ public class MDS {
     // get all descriptions before deleting
     // delete from id-decription
     // iterate list that we got and delete from descr-id
-    return 0;
+  	if(!idDescMap.containsKey(id)) return 0;
+  	long sum = 0;
+  	HashSet<Long> desc = idDescMap.get(id);
+  	for(long k :  desc)
+  	{
+  		sum += k;
+  		descIdMap.get(k).remove(id);
+  	}
+  	idDescMap.remove(id);
+    return sum;
   }
 
   /*
@@ -95,7 +140,17 @@ public class MDS {
   public int findPriceRange(long n, Money low, Money high) {
     // get list from descr-id map
     // iterate and find min, max price in the same iteration O(n)
-    return 0;
+  	HashSet<Long> hSet = descIdMap.get(n);
+  	int sum = 0;
+  	for(long k : hSet)
+  	{
+  		Money m = idPriceMap.get(k);
+  		if(m.compareTo(low) >= 0 && m.compareTo(high) <= 0)
+  		{
+  			sum += 1;
+  		}
+  	}
+    return sum;
   }
 
   /*
@@ -119,7 +174,18 @@ public class MDS {
   public long removeNames(long id, java.util.List<Long> list) {
     // remove from id-descr map
     // descr-id remove elem from list
-    return 0;
+  	HashSet<Long> desc = idDescMap.get(id);
+  	if(desc == null || list.isEmpty()) return 0;
+  	long sum = 0;
+  	HashSet<Long> hSet = new HashSet<>(list); 
+  	hSet.retainAll(desc);    // hSet contains common elements of list and listIds of the given id
+  	for(long k : hSet)
+  	{
+  		sum += k;
+  		desc.remove(k);             //removing names(descriptions) from idDescMap
+  		descIdMap.get(k).remove(id);//removing id from the descriptions that are removed
+  	}
+    return sum;
   }
 
   // Do not modify the Money class in a way that breaks LP3Driver.java
@@ -166,9 +232,10 @@ public class MDS {
 
       if (amount(this) > amount(other))
         return 1;
-      else if ((amount(this) < amount(other)))
+      else if(amount(this) < amount(other))
         return -1;
-      return 0;
+      else
+      	return 0;
     }
 
     public double amount(Money m) {
