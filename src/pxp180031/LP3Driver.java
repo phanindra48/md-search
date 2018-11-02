@@ -12,13 +12,16 @@ import java.util.Scanner;
 public class LP3Driver {
   public static void main(String[] args) throws Exception {
     Scanner in;
-    if (args.length > 0 && !args[0].equals("-")) {
+/*    if (args.length > 0 && !args[0].equals("-")) {
       File file = new File(args[0]);
       in = new Scanner(file);
     } else {
       in = new Scanner(System.in);
-    }
-    boolean VERBOSE = false;
+    }    
+*/
+    File file = new File("./lp3-inputs/420.txt");
+    in = new Scanner(file);
+    boolean VERBOSE = true;
     if (args.length > 1) {
       VERBOSE = Boolean.parseBoolean(args[1]);
     }

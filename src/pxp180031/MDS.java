@@ -6,6 +6,8 @@
 package pxp180031;
 
 import java.util.*;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 // If you want to create additional classes, place them in this file as subclasses of MDS
 
@@ -15,6 +17,7 @@ public class MDS {
   HashMap<Long, HashSet<Long>> idDescMap;
   HashMap<Long, HashSet<Long>> descIdMap;
   TreeSet<Long> ids;
+  DecimalFormat df, df1;
 
   // Constructors
   public MDS() {
@@ -22,6 +25,10 @@ public class MDS {
     idDescMap = new HashMap<>();
     descIdMap = new HashMap<>();
     ids = new TreeSet<>();
+    df = new DecimalFormat("#.00");
+    df1 = new DecimalFormat("#.00");
+		df.setRoundingMode(RoundingMode.DOWN);
+		df1.setRoundingMode(RoundingMode.CEILING);
   }
 
   /*
@@ -39,38 +46,47 @@ public class MDS {
     // insert/update id - price
     // insert / update id - description (need old and new listIds)
     // iterate list -> remove and add!
-  	int flag = 1;
   	Money m = idPriceMap.put(id, price);
   	HashSet<Long> newDesc = new HashSet<>();
   	HashSet<Long> temp;
-  	for(long listId : list)
+  	if(!list.isEmpty())
   	{
-  		newDesc.add(listId);
-  		HashSet<Long> hSet = descIdMap.get(listId);
-  		if(hSet == null)  
-  		{
-  			temp = new HashSet<>();
-  			temp.add(id);
-  			descIdMap.put(listId, temp);
-  		}
-  		else
-  		{
-  			hSet.add(id);
-  		}
+  		for(long listId : list)
+    	{
+    		newDesc.add(listId);
+    		HashSet<Long> hSet = descIdMap.get(listId);
+    		if(hSet == null)  
+    		{
+    			temp = new HashSet<>();
+    			temp.add(id);
+    			descIdMap.put(listId, temp);
+    		}
+    		else
+    		{
+    			hSet.add(id);
+    		}
+    	}
+    	if(m != null)
+    	{
+    		HashSet<Long> oldDesc = idDescMap.get(id);
+    		if(!oldDesc.isEmpty())
+    			oldDesc.removeAll(newDesc);
+    		for(long k : oldDesc)
+    		{
+    			descIdMap.get(k).remove(id);
+    		}
+    	}
+    	idDescMap.put(id, newDesc);
   	}
-  	if(m != null)
+  	if(m == null)
   	{
-  		HashSet<Long> oldDesc = idDescMap.get(id);
-  		if(!oldDesc.isEmpty())
-  			oldDesc.removeAll(newDesc);
-  		for(long k : oldDesc)
-  		{
-  			descIdMap.get(k).remove(id);
-  		}
-  		flag = 0;
+  		ids.add(id);
+  		return 1;
   	}
-  	idDescMap.put(id, newDesc);
-  	return flag;
+  	else
+  	{
+  		return 0;
+  	}
   }
 
   // b. Find(id): return price of item with given id (or 0, if not found).
@@ -106,6 +122,8 @@ public class MDS {
   		descIdMap.get(k).remove(id);
   	}
   	idDescMap.remove(id);
+  	ids.remove(id);
+  	idPriceMap.remove(id);
     return sum;
   }
 
@@ -118,7 +136,19 @@ public class MDS {
   public Money findMinPrice(long n) {
     // get list from descr-id map
     // iterate and find min price O(n)
-    return new Money();
+  	HashSet<Long> hSet = descIdMap.get(n);
+  	if(hSet == null || hSet.isEmpty()) return new Money();
+  	Iterator<Long> iter = hSet.iterator();
+  	Money minPrice = idPriceMap.get(iter.next());
+  	while(iter.hasNext())
+  	{
+  		Money m = idPriceMap.get(iter.next());
+  		if(minPrice.compareTo(m) == 1)
+  		{
+  			minPrice = m;
+  		}
+  	}
+  	return minPrice;
   }
 
   /*
@@ -129,7 +159,19 @@ public class MDS {
   public Money findMaxPrice(long n) {
     // get list from descr-id map
     // iterate and find max price O(n)
-    return new Money();
+  	HashSet<Long> hSet = descIdMap.get(n);
+  	if(hSet == null || hSet.isEmpty()) return new Money();
+  	Iterator iter = hSet.iterator();
+  	Money maxPrice = idPriceMap.get(iter.next());
+  	while(iter.hasNext())
+  	{
+  		Money m = idPriceMap.get(iter.next());
+  		if(maxPrice.compareTo(m) == -1)
+  		{
+  			maxPrice = m;
+  		}
+  	}
+  	return maxPrice ;
   }
 
   /*
@@ -151,8 +193,21 @@ public class MDS {
   		}
   	}
     return sum;
-  }
+  }  
 
+  
+  public long convertDouble(double price, long d)
+  {
+  	if(d > 0)
+  	{
+  		return ((long)(price*100))%(d * 100);
+  	}
+  	else
+  	{
+  		return (long)(price*100);
+  	}
+  }
+  
   /*
    * g. PriceHike(l,h,r): increase the price of every product, whose id is in the
    * range [l,h] by r%. Discard any fractional pennies in the new prices of items.
@@ -162,7 +217,42 @@ public class MDS {
     // use subset of treeset to get ids
     // iterate and update id-price map
     // sum the difference ∑(new - old)
-    return new Money();
+  	TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, h+1);
+  	double oldPrice, newPrice;
+  	long d1, d2, c2, dollars = 0, cents = 0, k1, k2;
+  	for(long k : hSet)
+  	{
+  		Money m = idPriceMap.get(k);
+  		oldPrice = m.amount(m);
+  		newPrice = oldPrice + (rate*oldPrice)/100;
+  		d2 = (long)(newPrice*100);
+  		k1 = (long)(oldPrice*100);
+  		k2 = d2- k1;
+  	/*	if(l == 33411)
+  			System.out.println("k1 "+k1+" k2 "+k2+" d2 "+d2);*/
+  		d1 = d2/100;
+  		if(d1 > 0)
+  			c2 = d2 - (d1*100);
+  		else 
+  			c2 = d2;
+  		k1 = k2/100;
+  		dollars += k1;
+  		if(k1 > 0)
+  			cents += k2 - (k1*100);
+  		else 
+  			cents += k2;
+  	/*	if(l == 33411)
+  			System.out.println("dollars "+dollars+" cents "+cents+" new price "+newPrice+" oldPrice "+oldPrice+ " cents "+k2+" "+k1+" "+d2);*/
+  		m = new Money(d1, (int)c2);
+  		idPriceMap.put(k, m);
+  	}
+  	dollars += cents/100;
+  	/*if(dollars == 134)
+  	{
+  		System.out.println(cents);
+  	}*/
+  	cents = cents%100;
+    return new Money(dollars, (int)cents);
   }
 
   /*
@@ -239,7 +329,7 @@ public class MDS {
     }
 
     public double amount(Money m) {
-      return m.d + (m.c / 100);
+      return m.d + ((double)m.c / 100);
     }
 
     public String toString() {
