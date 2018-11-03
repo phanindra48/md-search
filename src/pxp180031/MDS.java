@@ -188,21 +188,8 @@ public class MDS {
   		}
   	}
     return sum;
-  }  
-
-  
-  public long convertDouble(double price, long d)
-  {
-  	if(d > 0)
-  	{
-  		return ((long)(price*100))%(d * 100);
-  	}
-  	else
-  	{
-  		return (long)(price*100);
-  	}
   }
-  
+
   /*
    * g. PriceHike(l,h,r): increase the price of every product, whose id is in the
    * range [l,h] by r%. Discard any fractional pennies in the new prices of items.
@@ -213,29 +200,21 @@ public class MDS {
     // iterate and update id-price map
     // sum the difference ∑(new - old)
     TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, h+1);
-    double oldPrice, newPrice;
-
-    DecimalFormat df = new DecimalFormat("00.00");
-    df.setRoundingMode(RoundingMode.DOWN);
+    long oldPriceInCents, newPriceInCents;
 
     long dollarsSum = 0;
-    long centsSum = 0;
+    long net = 0;
     for(long k : hSet)
     {
       Money m = idPriceMap.get(k);
-      oldPrice = m.amount();
-      newPrice = (1 + 0.01 * rate) * oldPrice;
-      double netIncrease = 0.01 * rate * oldPrice;
-      Money priceObj = new Money(df.format(newPrice));
-      Money diffObj = new Money(df.format(netIncrease));
-      centsSum += diffObj.c;
-      dollarsSum += diffObj.d;
-      if (l == 2951203 && h == 19121475)
-      System.out.println(rate + " " + oldPrice + " " + newPrice + " " + netIncrease + " " + diffObj);
+      oldPriceInCents = m.d * 100 + m.c;
+      newPriceInCents = (long)(oldPriceInCents * (1 + 0.01 * rate));
+      Money priceObj = new Money(newPriceInCents / 100, (int)(newPriceInCents % 100));
+      net += newPriceInCents - oldPriceInCents;
       idPriceMap.put(k, priceObj);
     }
 
-    dollarsSum += centsSum / 100;
+    dollarsSum = net / 100;
     return new Money(dollarsSum, 0);
   }
 
