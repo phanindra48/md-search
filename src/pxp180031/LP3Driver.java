@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+// 407 489174
+// 420 1016105100
+// 100k 565883014879 (not matching!)
+// 200k 12957774
+// 300k 29000824
+// 500k 303607214
 public class LP3Driver {
   public static void main(String[] args) throws Exception {
     Scanner in;
