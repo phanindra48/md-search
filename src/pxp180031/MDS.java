@@ -217,42 +217,29 @@ public class MDS {
     // use subset of treeset to get ids
     // iterate and update id-price map
     // sum the difference ∑(new - old)
-  	TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, h+1);
-  	double oldPrice, newPrice;
-  	long d1, d2, c2, dollars = 0, cents = 0, k1, k2;
-  	for(long k : hSet)
-  	{
-  		Money m = idPriceMap.get(k);
-  		oldPrice = m.amount(m);
-  		newPrice = oldPrice + (rate*oldPrice)/100;
-  		d2 = (long)(newPrice*100);
-  		k1 = (long)(oldPrice*100);
-  		k2 = d2- k1;
-  	/*	if(l == 33411)
-  			System.out.println("k1 "+k1+" k2 "+k2+" d2 "+d2);*/
-  		d1 = d2/100;
-  		if(d1 > 0)
-  			c2 = d2 - (d1*100);
-  		else 
-  			c2 = d2;
-  		k1 = k2/100;
-  		dollars += k1;
-  		if(k1 > 0)
-  			cents += k2 - (k1*100);
-  		else 
-  			cents += k2;
-  	/*	if(l == 33411)
-  			System.out.println("dollars "+dollars+" cents "+cents+" new price "+newPrice+" oldPrice "+oldPrice+ " cents "+k2+" "+k1+" "+d2);*/
-  		m = new Money(d1, (int)c2);
-  		idPriceMap.put(k, m);
-  	}
-  	dollars += cents/100;
-  	/*if(dollars == 134)
-  	{
-  		System.out.println(cents);
-  	}*/
-  	cents = cents%100;
-    return new Money(dollars, (int)cents);
+    TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, h+1);
+    double oldPrice, newPrice;
+
+    DecimalFormat df = new DecimalFormat("00.00");
+    df.setRoundingMode(RoundingMode.DOWN);
+
+    int dollarsSum = 0;
+    int centsSum = 0;
+    for(long k : hSet)
+    {
+      Money m = idPriceMap.get(k);
+      oldPrice = m.amount();
+      newPrice = oldPrice + (rate * oldPrice) / 100;
+      Money priceObj = new Money(df.format(newPrice));
+      Money diffObj = new Money(df.format(newPrice - oldPrice));
+      centsSum += diffObj.c;
+      dollarsSum += diffObj.d;
+      // System.out.println(oldPrice + " " + newPrice + " " + df.format(newPrice - oldPrice) + " " + diffObj);
+      idPriceMap.put(k, priceObj);
+    }
+
+    dollarsSum += centsSum / 100;
+    return new Money(dollarsSum, 0);
   }
 
   /*
@@ -320,20 +307,20 @@ public class MDS {
       if (!(other instanceof Money))
         return -1;
 
-      if (amount(this) > amount(other))
+      if (this.amount() > other.amount())
         return 1;
-      else if(amount(this) < amount(other))
+      else if(this.amount() < other.amount())
         return -1;
       else
       	return 0;
     }
 
-    public double amount(Money m) {
-      return m.d + ((double)m.c / 100);
+    public double amount() {
+      return d + c * 0.01;
     }
 
     public String toString() {
-      return d + "." + c;
+      return d + String.format(".%02d", c);
     }
   }
 
