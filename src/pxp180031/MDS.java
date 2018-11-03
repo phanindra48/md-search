@@ -17,7 +17,6 @@ public class MDS {
   HashMap<Long, HashSet<Long>> idDescMap;
   HashMap<Long, HashSet<Long>> descIdMap;
   TreeSet<Long> ids;
-  DecimalFormat df, df1;
 
   // Constructors
   public MDS() {
@@ -25,10 +24,6 @@ public class MDS {
     idDescMap = new HashMap<>();
     descIdMap = new HashMap<>();
     ids = new TreeSet<>();
-    df = new DecimalFormat("#.00");
-    df1 = new DecimalFormat("#.00");
-		df.setRoundingMode(RoundingMode.DOWN);
-		df1.setRoundingMode(RoundingMode.CEILING);
   }
 
   /*
@@ -223,18 +218,20 @@ public class MDS {
     DecimalFormat df = new DecimalFormat("00.00");
     df.setRoundingMode(RoundingMode.DOWN);
 
-    int dollarsSum = 0;
-    int centsSum = 0;
+    long dollarsSum = 0;
+    long centsSum = 0;
     for(long k : hSet)
     {
       Money m = idPriceMap.get(k);
       oldPrice = m.amount();
-      newPrice = oldPrice + (rate * oldPrice) / 100;
+      newPrice = (1 + 0.01 * rate) * oldPrice;
+      double netIncrease = 0.01 * rate * oldPrice;
       Money priceObj = new Money(df.format(newPrice));
-      Money diffObj = new Money(df.format(newPrice - oldPrice));
+      Money diffObj = new Money(df.format(netIncrease));
       centsSum += diffObj.c;
       dollarsSum += diffObj.d;
-      // System.out.println(oldPrice + " " + newPrice + " " + df.format(newPrice - oldPrice) + " " + diffObj);
+      if (l == 2951203 && h == 19121475)
+      System.out.println(rate + " " + oldPrice + " " + newPrice + " " + netIncrease + " " + diffObj);
       idPriceMap.put(k, priceObj);
     }
 
