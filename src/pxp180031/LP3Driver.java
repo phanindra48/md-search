@@ -9,12 +9,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-// 407 489174
-// 420 1016105100
-// 100k 565883014879 (not matching!)
-// 200k 12957774
-// 300k 29000824
-// 500k 303607214
+
 public class LP3Driver {
   public static void main(String[] args) throws Exception {
     Scanner in;
@@ -25,9 +20,9 @@ public class LP3Driver {
       in = new Scanner(System.in);
     }    
 */
-    File file = new File("./lp3-inputs/420.txt");
+    File file = new File("./lp3-inputs/407.txt");
     in = new Scanner(file);
-    boolean VERBOSE = true;
+    boolean VERBOSE = false;
     if (args.length > 1) {
       VERBOSE = Boolean.parseBoolean(args[1]);
     }

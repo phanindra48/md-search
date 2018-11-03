@@ -6,8 +6,6 @@
 package pxp180031;
 
 import java.util.*;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 
 // If you want to create additional classes, place them in this file as subclasses of MDS
 
@@ -156,7 +154,7 @@ public class MDS {
     // iterate and find max price O(n)
   	HashSet<Long> hSet = descIdMap.get(n);
   	if(hSet == null || hSet.isEmpty()) return new Money();
-  	Iterator iter = hSet.iterator();
+  	Iterator<Long> iter = hSet.iterator();
   	Money maxPrice = idPriceMap.get(iter.next());
   	while(iter.hasNext())
   	{
@@ -200,16 +198,16 @@ public class MDS {
     // iterate and update id-price map
     // sum the difference ∑(new - old)
     TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, true, h, true);
-    long oldPriceInCents, newPriceInCents;
+    long oldPriceInCents, newPriceInCents, diff;
     long net = 0;
     for(long k : hSet)
     {
       Money m = idPriceMap.get(k);
       oldPriceInCents = m.d * 100 + m.c;
-      // newPriceInCents = (long)(oldPriceInCents * (1 + 0.01 * rate));
-      newPriceInCents = oldPriceInCents + ((long)(rate * oldPriceInCents)) / 100;
+      diff = (long)(oldPriceInCents * (0.01 * rate)); 								//diff for the difference between newPriceInCents and oldPriceInCents
+      newPriceInCents = oldPriceInCents + diff;
       Money priceObj = new Money(newPriceInCents / 100, (int)(newPriceInCents % 100));
-      net += (long)(oldPriceInCents * (0.01 * rate));
+      net += diff;
       idPriceMap.put(k, priceObj);
     }
 
