@@ -282,16 +282,16 @@ public class MDS {
       if (!(other instanceof Money))
         return -1;
 
-      if (this.amount() > other.amount())
+      if (this.amountInCents() > other.amountInCents())
         return 1;
-      else if(this.amount() < other.amount())
+      else if(this.amountInCents() < other.amountInCents())
         return -1;
       else
       	return 0;
     }
 
-    public double amount() {
-      return d + c * 0.01;
+    private long amountInCents() {
+      return d * 100 + c;
     }
 
     public String toString() {
