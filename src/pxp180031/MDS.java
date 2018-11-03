@@ -199,7 +199,7 @@ public class MDS {
     // use subset of treeset to get ids
     // iterate and update id-price map
     // sum the difference ∑(new - old)
-    TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, h+1);
+    TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, true, h, true);
     long oldPriceInCents, newPriceInCents;
 
     long dollarsSum = 0;
