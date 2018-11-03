@@ -201,21 +201,20 @@ public class MDS {
     // sum the difference ∑(new - old)
     TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, true, h, true);
     long oldPriceInCents, newPriceInCents;
-
-    long dollarsSum = 0;
     long net = 0;
     for(long k : hSet)
     {
       Money m = idPriceMap.get(k);
       oldPriceInCents = m.d * 100 + m.c;
-      newPriceInCents = (long)(oldPriceInCents * (1 + 0.01 * rate));
+      // newPriceInCents = (long)(oldPriceInCents * (1 + 0.01 * rate));
+      newPriceInCents = oldPriceInCents + ((long)(rate * oldPriceInCents)) / 100;
       Money priceObj = new Money(newPriceInCents / 100, (int)(newPriceInCents % 100));
-      net += newPriceInCents - oldPriceInCents;
+      net += (long)(oldPriceInCents * (0.01 * rate));
       idPriceMap.put(k, priceObj);
     }
 
-    dollarsSum = net / 100;
-    return new Money(dollarsSum, 0);
+    long netIncreaseInDollars = net / 100;
+    return new Money(netIncreaseInDollars, 0);
   }
 
   /*
