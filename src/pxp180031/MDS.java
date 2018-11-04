@@ -39,57 +39,46 @@ public class MDS {
     // insert/update id - price
     // insert / update id - description (need old and new listIds)
     // iterate list -> remove and add!
-  	Money m = idPriceMap.put(id, price);
-  	HashSet<Long> newDesc = new HashSet<>();
-  	HashSet<Long> temp;
-  	if(!list.isEmpty())
-  	{
-  		for(long listId : list)
-    	{
-    		newDesc.add(listId);
-    		HashSet<Long> hSet = descIdMap.get(listId);
-    		if(hSet == null)  
-    		{
-    			temp = new HashSet<>();
-    			temp.add(id);
-    			descIdMap.put(listId, temp);
-    		}
-    		else
-    		{
-    			hSet.add(id);
-    		}
-    	}
-    	if(m != null)
-    	{
-    		HashSet<Long> oldDesc = idDescMap.get(id);
-    		if(!oldDesc.isEmpty())
-    			oldDesc.removeAll(newDesc);
-    		for(long k : oldDesc)
-    		{
-    			descIdMap.get(k).remove(id);
-    		}
-    	}
-    	idDescMap.put(id, newDesc);
-  	}
-  	if(m == null)
-  	{
-  		ids.add(id);
-  		return 1;
-  	}
-  	else
-  	{
-  		return 0;
-  	}
+    Money m = idPriceMap.put(id, price);
+    HashSet<Long> newDesc = new HashSet<>();
+    HashSet<Long> temp;
+    if (!list.isEmpty()) {
+      for (long listId : list) {
+        newDesc.add(listId);
+        HashSet<Long> hSet = descIdMap.get(listId);
+        if (hSet == null) {
+          temp = new HashSet<>();
+          temp.add(id);
+          descIdMap.put(listId, temp);
+        } else {
+          hSet.add(id);
+        }
+      }
+      if (m != null) {
+        HashSet<Long> oldDesc = idDescMap.get(id);
+        if (!oldDesc.isEmpty())
+          oldDesc.removeAll(newDesc);
+        for (long k : oldDesc) {
+          descIdMap.get(k).remove(id);
+        }
+      }
+      idDescMap.put(id, newDesc);
+    }
+    if (m == null) {
+      ids.add(id);
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   // b. Find(id): return price of item with given id (or 0, if not found).
   public Money find(long id) {
     // get from id - price
-  	Money m = idPriceMap.get(id);
-  	if(m != null)
-  	{
-  		return m;
-  	}
+    Money m = idPriceMap.get(id);
+    if (m != null) {
+      return m;
+    }
     return new Money();
   }
 
@@ -106,17 +95,17 @@ public class MDS {
     // get all descriptions before deleting
     // delete from id-decription
     // iterate list that we got and delete from descr-id
-  	if(!idDescMap.containsKey(id)) return 0;
-  	long sum = 0;
-  	HashSet<Long> desc = idDescMap.get(id);
-  	for(long k :  desc)
-  	{
-  		sum += k;
-  		descIdMap.get(k).remove(id);
-  	}
-  	idDescMap.remove(id);
-  	ids.remove(id);
-  	idPriceMap.remove(id);
+    if (!idDescMap.containsKey(id))
+      return 0;
+    long sum = 0;
+    HashSet<Long> desc = idDescMap.get(id);
+    for (long k : desc) {
+      sum += k;
+      descIdMap.get(k).remove(id);
+    }
+    idDescMap.remove(id);
+    ids.remove(id);
+    idPriceMap.remove(id);
     return sum;
   }
 
@@ -129,19 +118,18 @@ public class MDS {
   public Money findMinPrice(long n) {
     // get list from descr-id map
     // iterate and find min price O(n)
-  	HashSet<Long> hSet = descIdMap.get(n);
-  	if(hSet == null || hSet.isEmpty()) return new Money();
-  	Iterator<Long> iter = hSet.iterator();
-  	Money minPrice = idPriceMap.get(iter.next());
-  	while(iter.hasNext())
-  	{
-  		Money m = idPriceMap.get(iter.next());
-  		if(minPrice.compareTo(m) == 1)
-  		{
-  			minPrice = m;
-  		}
-  	}
-  	return minPrice;
+    HashSet<Long> hSet = descIdMap.get(n);
+    if (hSet == null || hSet.isEmpty())
+      return new Money();
+    Iterator<Long> iter = hSet.iterator();
+    Money minPrice = idPriceMap.get(iter.next());
+    while (iter.hasNext()) {
+      Money m = idPriceMap.get(iter.next());
+      if (minPrice.compareTo(m) == 1) {
+        minPrice = m;
+      }
+    }
+    return minPrice;
   }
 
   /*
@@ -152,19 +140,18 @@ public class MDS {
   public Money findMaxPrice(long n) {
     // get list from descr-id map
     // iterate and find max price O(n)
-  	HashSet<Long> hSet = descIdMap.get(n);
-  	if(hSet == null || hSet.isEmpty()) return new Money();
-  	Iterator<Long> iter = hSet.iterator();
-  	Money maxPrice = idPriceMap.get(iter.next());
-  	while(iter.hasNext())
-  	{
-  		Money m = idPriceMap.get(iter.next());
-  		if(maxPrice.compareTo(m) == -1)
-  		{
-  			maxPrice = m;
-  		}
-  	}
-  	return maxPrice ;
+    HashSet<Long> hSet = descIdMap.get(n);
+    if (hSet == null || hSet.isEmpty())
+      return new Money();
+    Iterator<Long> iter = hSet.iterator();
+    Money maxPrice = idPriceMap.get(iter.next());
+    while (iter.hasNext()) {
+      Money m = idPriceMap.get(iter.next());
+      if (maxPrice.compareTo(m) == -1) {
+        maxPrice = m;
+      }
+    }
+    return maxPrice;
   }
 
   /*
@@ -175,16 +162,14 @@ public class MDS {
   public int findPriceRange(long n, Money low, Money high) {
     // get list from descr-id map
     // iterate and find min, max price in the same iteration O(n)
-  	HashSet<Long> hSet = descIdMap.get(n);
-  	int sum = 0;
-  	for(long k : hSet)
-  	{
-  		Money m = idPriceMap.get(k);
-  		if(m.compareTo(low) >= 0 && m.compareTo(high) <= 0)
-  		{
-  			sum += 1;
-  		}
-  	}
+    HashSet<Long> hSet = descIdMap.get(n);
+    int sum = 0;
+    for (long k : hSet) {
+      Money m = idPriceMap.get(k);
+      if (m.compareTo(low) >= 0 && m.compareTo(high) <= 0) {
+        sum += 1;
+      }
+    }
     return sum;
   }
 
@@ -200,13 +185,13 @@ public class MDS {
     TreeSet<Long> hSet = (TreeSet<Long>) ids.subSet(l, true, h, true);
     long oldPriceInCents, newPriceInCents, diff;
     long net = 0;
-    for(long k : hSet)
-    {
+    for (long k : hSet) {
       Money m = idPriceMap.get(k);
       oldPriceInCents = m.d * 100 + m.c;
-      diff = (long)(oldPriceInCents * (0.01 * rate)); 								//diff for the difference between newPriceInCents and oldPriceInCents
+      diff = (long) (oldPriceInCents * (0.01 * rate)); // diff for the difference between newPriceInCents and
+                                                       // oldPriceInCents
       newPriceInCents = oldPriceInCents + diff;
-      Money priceObj = new Money(newPriceInCents / 100, (int)(newPriceInCents % 100));
+      Money priceObj = new Money(newPriceInCents / 100, (int) (newPriceInCents % 100));
       net += diff;
       idPriceMap.put(k, priceObj);
     }
@@ -224,17 +209,17 @@ public class MDS {
   public long removeNames(long id, java.util.List<Long> list) {
     // remove from id-descr map
     // descr-id remove elem from list
-  	HashSet<Long> desc = idDescMap.get(id);
-  	if(desc == null || list.isEmpty()) return 0;
-  	long sum = 0;
-  	HashSet<Long> hSet = new HashSet<>(list); 
-  	hSet.retainAll(desc);    // hSet contains common elements of list and listIds of the given id
-  	for(long k : hSet)
-  	{
-  		sum += k;
-  		desc.remove(k);             //removing names(descriptions) from idDescMap
-  		descIdMap.get(k).remove(id);//removing id from the descriptions that are removed
-  	}
+    HashSet<Long> desc = idDescMap.get(id);
+    if (desc == null || list.isEmpty())
+      return 0;
+    long sum = 0;
+    HashSet<Long> hSet = new HashSet<>(list);
+    hSet.retainAll(desc); // hSet contains common elements of list and listIds of the given id
+    for (long k : hSet) {
+      sum += k;
+      desc.remove(k); // removing names(descriptions) from idDescMap
+      descIdMap.get(k).remove(id);// removing id from the descriptions that are removed
+    }
     return sum;
   }
 
@@ -282,10 +267,10 @@ public class MDS {
 
       if (this.amountInCents() > other.amountInCents())
         return 1;
-      else if(this.amountInCents() < other.amountInCents())
+      else if (this.amountInCents() < other.amountInCents())
         return -1;
       else
-      	return 0;
+        return 0;
     }
 
     private long amountInCents() {
