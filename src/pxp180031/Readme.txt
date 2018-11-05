@@ -11,8 +11,8 @@ I. Files List
 	Readme.txt
  
 II. How to Run the Project
-	1. Compile the following java file in any IDE (eg: Eclipse)
-	2. Run the file using run command from the same IDE.
+* To compile `javac -d bin -sourcepath src src/pxp180031/LP3Driver.java`
+* To Run `java -cp bin pxp180031.LP3Driver <input_path>`
 
 Description:-
 
