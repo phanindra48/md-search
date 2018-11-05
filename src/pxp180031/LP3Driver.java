@@ -9,19 +9,16 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-
 public class LP3Driver {
   public static void main(String[] args) throws Exception {
     Scanner in;
-/*    if (args.length > 0 && !args[0].equals("-")) {
+    if (args.length > 0 && !args[0].equals("-")) {
       File file = new File(args[0]);
       in = new Scanner(file);
     } else {
       in = new Scanner(System.in);
-    }    
-*/
-    File file = new File("./lp3-inputs/407.txt");
-    in = new Scanner(file);
+    }
+
     boolean VERBOSE = false;
     if (args.length > 1) {
       VERBOSE = Boolean.parseBoolean(args[1]);
