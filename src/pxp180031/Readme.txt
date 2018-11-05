@@ -1,4 +1,4 @@
-Long Project 2: Implementing Multi-Dimensional Search
+Long Project 3: Implementing Multi-Dimensional Search
 
 Teammates: 
 Phanindra Pydisetty   (pxp180031)
